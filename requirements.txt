@@ -1,0 +1,4 @@
+mcp>=2.3
+pyserial>=3.5
+esptool>=5.0
+anthropic>=2.12
