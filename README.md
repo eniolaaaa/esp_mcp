@@ -118,11 +118,11 @@ The agent only gets the four MCP tools plus `report_verdict(verdict, reason)`. I
 
 ```
 python run_eval.py --agent baseline     # the run_test.py check, no API calls
-python run_eval.py --agent claude       # Claude through the Claude API
-python run_eval.py --agent claude --reps 3 --cases boot_loop,heap_leak,stall
+python run_eval.py --agent llm          # an LLM agent through the API
+python run_eval.py --agent llm --reps 3 --cases boot_loop,heap_leak,stall
 ```
 
-`--agent claude` needs an Anthropic API key in `ANTHROPIC_API_KEY`. API usage is billed separately from a Claude subscription. `--model` and `--effort` choose the model and effort level (defaults: `claude-opus-5-5`, `high`).
+`--agent llm` needs an API key in `ANTHROPIC_API_KEY`. `--model` and `--effort` choose the model and effort level.
 
 Each run writes `eval_runs/<timestamp>_<agent>/`:
 

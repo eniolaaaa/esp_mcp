@@ -6,8 +6,8 @@ correctly. The agent only has the MCP tools plus report_verdict, so it can't tel
 which case it is looking at. Trials run one at a time (one board), in random order.
 
   python run_eval.py --agent baseline                 # run_test.py's "BOOT OK" check, no API calls
-  python run_eval.py --agent claude                   # Claude through the Messages API
-  python run_eval.py --agent claude --reps 3 --cases boot_loop,stall
+  python run_eval.py --agent llm                      # an LLM agent through the API
+  python run_eval.py --agent llm --reps 3 --cases boot_loop,stall
 
 Each run writes eval_runs/<timestamp>_<agent>/:
   results.jsonl               one row per trial: verdict, expected, correct, status, usage, ...
@@ -142,7 +142,7 @@ async def baseline_agent(session: ClientSession, trial: Trial, port: str) -> Non
     trial.reason = "'BOOT OK' found" if found else "'BOOT OK' not found"
 
 
-def claude_agent(client: anthropic.AsyncAnthropic, model: str, effort: str, max_turns: int):
+def llm_agent(client: anthropic.AsyncAnthropic, model: str, effort: str, max_turns: int):
     async def run(session: ClientSession, trial: Trial, port: str) -> None:
         listed = (await session.list_tools()).tools
         tools = [{"name": t.name, "description": t.description or "",
@@ -279,7 +279,7 @@ def summarize(rows: list[dict], header: str, model: str | None, wall_s: float) -
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--agent", choices=["baseline", "claude"], required=True)
+    p.add_argument("--agent", choices=["baseline", "llm"], required=True)
     p.add_argument("--port", default="COM3")
     p.add_argument("--cases", help="comma-separated subset of: " + ", ".join(CASES))
     p.add_argument("--reps", type=int, default=1, help="trials per case (default 1)")
@@ -302,15 +302,15 @@ async def main() -> None:
     if missing:
         sys.exit(f"Missing firmware for {', '.join(missing)}: run python build_firmware.py")
 
-    if args.agent == "claude":
+    if args.agent == "llm":
         client = anthropic.AsyncAnthropic(max_retries=4)
         try:
             await client.models.retrieve(args.model)
         except Exception as e:
-            sys.exit(f"Can't use {args.model} on the Claude API: {e}\n"
+            sys.exit(f"Can't use {args.model} through the API: {e}\n"
                      "Set ANTHROPIC_API_KEY (or run `ant auth login`) and try again.")
-        agent = claude_agent(client, args.model, args.effort, args.max_turns)
-        desc, model = f"claude ({args.model}, effort {args.effort})", args.model
+        agent = llm_agent(client, args.model, args.effort, args.max_turns)
+        desc, model = f"llm ({args.model}, effort {args.effort})", args.model
     else:
         agent = baseline_agent
         desc, model = 'baseline ("BOOT OK" substring, 6 s capture)', None
