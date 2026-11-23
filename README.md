@@ -8,7 +8,7 @@ I built this as a mini version of a hardware-in-the-loop test lab. Instead of a 
 
 I built 7 test firmwares: the working demo and 6 that are broken on purpose but still print the normal `BOOT OK` line (details in [Fault firmware](#fault-firmware)). On my board, a scripted check that looks for `BOOT OK` gets **3 of 7 right**. It passes 4 of the broken builds: a boot loop, a memory leak, a stalled heartbeat and the wrong region setting.
 
-That's the gap an agent should close by actually reading the log. `run_eval.py` measures this blind: the agent never sees which firmware it's testing (see [Agent eval](#agent-eval)). The harness works on real hardware. I haven't published Claude's score yet because that run needs API access.
+That's the gap an agent should close by actually reading the log. `run_eval.py` measures this blind: the agent never sees which firmware it's testing (see [Agent eval](#agent-eval)). The harness works on real hardware. I haven't published an agent's score yet because that run needs API access.
 
 ## Tools
 
